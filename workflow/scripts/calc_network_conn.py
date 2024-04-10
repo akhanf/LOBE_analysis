@@ -1,4 +1,3 @@
-atlas_tsv = 'resources/atlas/atlas-{atlas}_dseg.tsv'
 import pandas as pd
 import nibabel as nib
 import numpy as np

@@ -353,7 +353,7 @@ rule calc_network_sc:
 
 rule calc_network_sfc:
     input:
-        pconn_struc=bids(
+        pconn_sc=bids(
             root=root,
             datatype="dwi",
             den="32k",
@@ -361,7 +361,7 @@ rule calc_network_sfc:
             suffix="struc.pconn.nii",
             **config["subj_wildcards"],
         ),
-        pconn_func=bids(
+        pconn_fc=bids(
             root=root,
             datatype="func",
             desc="preproc",
@@ -375,7 +375,7 @@ rule calc_network_sfc:
         ),
         label_tsv="resources/atlas/atlas-{atlas}_dseg.tsv",
     output:
-        pconn_sfc=bids(
+        pconn=bids(
             root=root,
             datatype="func",
             desc="preproc",
