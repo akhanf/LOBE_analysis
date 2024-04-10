@@ -291,3 +291,105 @@ rule calc_sfc:
         "grouped_subject"
     script:
         "../scripts/calc_sfc.py"
+
+rule calc_network_fc:
+    input:
+        pconn=bids(
+            root=root,
+            datatype="func",
+            desc="preproc",
+            den="32k",
+            task="{task}",
+            denoise="{denoise}",
+            fwhm="{fwhm}",
+            atlas="{atlas}",
+            suffix="bold.pconn.nii",
+            **config["subj_wildcards"],
+        ),
+        label_tsv="resources/atlas/atlas-{atlas}_dseg.tsv",
+    output:
+        pconn=bids(
+            root=root,
+            datatype="func",
+            desc="preproc",
+            den="32k",
+            task="{task}",
+            denoise="{denoise}",
+            fwhm="{fwhm}",
+            atlas="{atlas}",
+            suffix="netbold.pconn.nii",
+            **config["subj_wildcards"],
+        ),
+    group:
+        "grouped_subject"
+    script:
+        "../scripts/calc_network_conn.py"
+
+rule calc_network_sc:
+    input:
+        pconn=bids(
+            root=root,
+            datatype="dwi",
+            den="32k",
+            atlas="{atlas}",
+            suffix="struc.pconn.nii",
+            **config["subj_wildcards"],
+        ),
+        label_tsv="resources/atlas/atlas-{atlas}_dseg.tsv",
+    output:
+        pconn=bids(
+            root=root,
+            datatype="dwi",
+            den="32k",
+            atlas="{atlas}",
+            suffix="netstruc.pconn.nii",
+            **config["subj_wildcards"],
+        ),
+    group:
+        "grouped_subject"
+    script:
+        "../scripts/calc_network_conn.py"
+
+
+rule calc_network_sfc:
+    input:
+        pconn_struc=bids(
+            root=root,
+            datatype="dwi",
+            den="32k",
+            atlas="{atlas}",
+            suffix="struc.pconn.nii",
+            **config["subj_wildcards"],
+        ),
+        pconn_func=bids(
+            root=root,
+            datatype="func",
+            desc="preproc",
+            den="32k",
+            task="{task}",
+            denoise="{denoise}",
+            fwhm="{fwhm}",
+            atlas="{atlas}",
+            suffix="bold.pconn.nii",
+            **config["subj_wildcards"],
+        ),
+        label_tsv="resources/atlas/atlas-{atlas}_dseg.tsv",
+    output:
+        pconn_sfc=bids(
+            root=root,
+            datatype="func",
+            desc="preproc",
+            den="32k",
+            task="{task}",
+            denoise="{denoise}",
+            fwhm="{fwhm}",
+            atlas="{atlas}",
+            suffix="netsfc.pconn.nii",
+            **config["subj_wildcards"],
+        ),
+    group:
+        "grouped_subject"
+    script:
+        "../scripts/calc_network_sfc.py"
+
+
