@@ -3,6 +3,37 @@ import nibabel as nib
 import numpy as np
 from scipy.stats import spearmanr
 
+def get_network_vertices(parcel_axis, networks):
+    """ this gets the vertex indices for the agglomerated
+        network regions, from the regional parcel_axis, and mapping from
+        region to network"""
+    structures = parcel_axis.nvertices.keys()
+
+    network_names = networks.unique()
+
+    verts_list = []
+    for i,net in enumerate(network_names):
+
+        region_indices = np.where(networks == net)[0]
+        
+        verts={}
+        for structure in structures:
+            
+            temp_verts = []
+            
+            for region in region_indices:
+                if structure in parcel_axis.vertices[region]:
+                    temp_verts.append(parcel_axis.vertices[region][structure])
+                    
+            verts[structure] = np.concatenate(temp_verts)
+
+        verts_list.append(verts)
+            
+
+    return np.array(verts_list)
+
+
+
 nib_sc = nib.load(snakemake.input.pconn_sc)
 nib_fc = nib.load(snakemake.input.pconn_fc)
 
@@ -48,11 +79,12 @@ for i,net_i in enumerate(network_names):
 
 # save as a pconn cifti
 # we need to update the list of regions (to be network names now):
+# and also provide an updated list of vertices for each region
 parcel_axis = nib_sc.header.get_axis(0)
 network_axis = parcel_axis
 network_axis.name = network_names
+network_axis.vertices = get_network_vertices(parcel_axis,df_atlas.networks)
 
-# TODO: also update the vertices so we acn visualize properly in wb_view
 
 nib_network = nib.Cifti2Image(sfc_network,header=(network_axis,network_axis))
 
