@@ -1,6 +1,6 @@
 import pandas as pd
 
-df_subjects = pd.read_csv(snakemake.input.subjects_tsv,sep='\t',dtype={"participant_label": str})
+df_subjects = pd.DataFrame({'participant_label': snakemake.params.subjects})
 
 df_demog = pd.read_table(snakemake.input.ndar_txt,header=0,skiprows=[1])
 

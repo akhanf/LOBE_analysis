@@ -1,6 +1,6 @@
 
 in_root: '$HOME/graham' #for cbs server
-#in_root: '/home/akhanf' #for graham
+#in_root: '$HOME' #for graham
 
 #files in one big zip file - these paths are relative to in_root defined above
 in_agg_zip: 
@@ -11,9 +11,9 @@ in_agg_zip:
     HCP: 'projects/ctb-akhanf-ab/cfmm-bids/Khan/LOBE/derivatives/snakebatch_HCP_snakeanat_fmriprep_2024_03_21.zip'
     LOBE: 'projects/ctb-akhanf-ab/cfmm-bids/Khan/LOBE/derivatives/snakebatch_LOBE_2024_03_19.zip'
 
-in_demog_tabular:
+in_tabular:
   HCP: 'projects/ctb-akhanf/ext-data/hcp_development/HCPDevImagingManifestBeh/ndar_subject01.txt'
-
+  LOBE: 'projects/ctb-akhanf-ab/cfmm-bids/Khan/LOBE/raw/baseline/clinical/participants.tsv'
 
   
 
