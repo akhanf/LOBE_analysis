@@ -69,7 +69,7 @@ rule all_lists:
 
 rule create_subject_list:
     input:
-        zipfile=config["in_agg_zip"]["snakebatch"],
+        zipfile=lambda wildcards: os.path.join(in_root,config["in_agg_zip"]["snakebatch"][wildcards.dataset]),
     output:
         "resources/dataset-{dataset}_subjects.tsv",
     shell:
