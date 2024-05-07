@@ -45,6 +45,7 @@ rule all:
         get_dwi_targets(),
         get_func_targets(),
         get_sfc_targets(),
+	'resources/merged_tabular.tsv'
 
 
 rule all_dwi:

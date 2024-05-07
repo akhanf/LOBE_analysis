@@ -18,4 +18,14 @@ rule import_lobe_tabular:
     script:
         "../scripts/import_lobe_tabular.py"
 
-
+rule merge_tabular:
+    input:
+        subjects_tsvs=expand("resources/dataset-{dataset}_subjects.tsv",
+            dataset=config['datasets']),
+        tabular_tsvs=expand("resources/dataset-{dataset}_tabular.tsv",
+            dataset=config['datasets'])
+    params:
+        datasets = config['datasets']
+    output:
+        tsv="resources/merged_tabular.tsv"
+    script: "../scripts/merge_tabular.py"
