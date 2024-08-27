@@ -178,3 +178,15 @@ rule plot_struc_chord:
         "grouped_subject"
     script:
         "../scripts/plot_chord.py"
+
+rule plot_ttest:
+    input:
+        tsv='resources/merged_tabular.tsv'
+    params:
+        group1_query=lambda wildcards: config['groups'][wildcards.group1],
+        group2_query=lambda wildcards: config['groups'][wildcards.group2],
+        column_name='{column}',
+    output:
+        png='{root}/stats/group1-{group1}_group2-{group2}_column-{column}_ttest.png'
+    script:
+        '../scripts/ttest.py'
