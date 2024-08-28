@@ -25,7 +25,21 @@ rule merge_tabular:
         tabular_tsvs=expand("resources/dataset-{dataset}_tabular.tsv",
             dataset=config['datasets'])
     params:
-        datasets = config['datasets']
+        datasets = config['datasets'],
+        subjects=subjects
     output:
         tsv="resources/merged_tabular.tsv"
     script: "../scripts/merge_tabular.py"
+
+rule add_conn_to_tabular:
+    input:	
+        get_dwi_targets(),
+        get_func_targets(),
+        get_sfc_targets(),
+        tsv="resources/merged_tabular.tsv",
+    params:
+        subjects=subjects
+    output:
+        tsv="resources/merged_tabular_withconn.tsv"
+    notebook:
+        '../notebooks/add_conn_to_tabular.py.ipynb'	

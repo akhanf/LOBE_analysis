@@ -2,14 +2,16 @@ import pandas as pd
 
 #load up subjects tables
 datasets = snakemake.params.datasets
+subjects = snakemake.params.subjects
 tabular_tsvs = snakemake.input.tabular_tsvs
 subjects_tsvs = snakemake.input.subjects_tsvs
 
 df_list=[]
 for tabular_tsv,subjects_tsv,dataset in zip(tabular_tsvs,subjects_tsvs,datasets):
-    df_ = pd.read_csv(subjects_tsv,
-                                       dtype={"participant_label": str},
-                                       sep='\t')
+    df_ = pd.DataFrame({'participant_label': snakemake.params.subjects[dataset]})
+#    df_ = pd.read_csv(subjects_tsv,
+#                                       dtype={"participant_label": str},
+#                                       sep='\t')
     df_['participant_id'] = 'sub-' + df_['participant_label']
     
     #add a new dataset column

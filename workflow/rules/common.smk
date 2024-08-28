@@ -115,10 +115,7 @@ def get_sfc_targets():
 
     return targets
 
-def get_ttest_targets():
-    for ttest,groups in config['ttests'].items():
-        
-        
-
-    expand(
-        png='{root}/stats/group1-{group1}_group2-{group2}_column-{column}_ttest.png'
+#def get_ttest_targets():
+#    for ttest,groups in config['ttests'].items():
+#    expand(
+#        png='{root}/stats/group1-{group1}_group2-{group2}_column-{column}_ttest.png'
