@@ -181,12 +181,12 @@ rule plot_struc_chord:
 
 rule plot_ttest:
     input:
-        tsv='resources/merged_tabular.tsv'
+        tsv='resources/merged_tabular_withconn.tsv'
     params:
         group1_query=lambda wildcards: config['groups'][wildcards.group1],
         group2_query=lambda wildcards: config['groups'][wildcards.group2],
-        column_name='{column}',
+        coltype='{coltype}',
     output:
-        png='{root}/stats/group1-{group1}_group2-{group2}_column-{column}_ttest.png'
+        plotsdir=directory('stats/group1-{group1}_group2-{group2}_coltype-{coltype}_ttestplots')
     script:
         '../scripts/ttest.py'

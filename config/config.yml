@@ -3,14 +3,44 @@ in_root: '$HOME/graham' #for cbs server
 #in_root: '$HOME' #for graham
 
 groups:
-  dre: 'dre == 1'
-  nondre: 'dre == 0'
+  dre: 'dre_first_scan == 1'
+  nondre: 'dre_first_scan == 0'
+
+coltypes:
+  - NSFC
+  - NFC
+  - NSC
 
 ttests:
   - group1: dre
     group2: nondre
-  - group1: tle
-    group2: nontle
+
+ # - group1: tle
+ #   group2: nontle
+#  - group1: motor_focal_seizures
+#    group2: non-motor_focal_seizures	
+#  - group1: generalized_seizures
+#    group2: non-generalized_seizures    
+#  - group1: FTBTC
+#    group2: no_FTBTC    
+#  - group1: dre_first_scan	
+#    group2: no_dre_first_scan    
+#  - group1: lat_eeg_left
+#    group2: no_lat_eeg_left
+#  - group1: lat_eeg_right
+#    group2: no_lat_eeg_right
+#  - group1: lat_seeg_left
+#    group2: no_lat_seeg_left    
+#  - group1: lat_seeg_right        
+#    group2: no_lat_seeg_right    
+#  - group1: lat_mri_left
+#    group2: no_lat_mri_left
+#  - group1: lat_mri_right              
+#    group2: no_lat_mri_right    
+    
+    
+    
+#lat_pet_left	lat_pet_right	lat_semiology_left	lat_semiology_right	lat_final_left	lat_final_right	lat_final_bilateral	lat_final_multifocal	loc_eeg_frontal	loc_eeg_occipital	loc_eeg_parietal	loc_eeg_temporal	loc_mri_frontal	loc_mri_occipital	loc_mri_parietal	loc_mri_temporal	loc_pet_frontal	loc_pet_occipital	loc_pet_parietal	loc_pet_temporal	loc_semiology	loc_final_frontal	loc_final_occipital	loc_final_parietal	loc_final_temporal	loc_final_temporal_plus	loc_final_extratemporal
 
 
 
@@ -25,7 +55,7 @@ in_agg_zip:
 
 in_tabular:
   HCP: 'projects/ctb-akhanf/ext-data/hcp_development/HCPDevImagingManifestBeh/ndar_subject01.txt'
-  LOBE: 'projects/ctb-akhanf-ab/cfmm-bids/Khan/LOBE/raw/baseline/clinical/participants.tsv'
+  LOBE: 'projects/ctb-akhanf-ab/cfmm-bids/Khan/LOBE/raw/baseline/clinical/participants.tsv' #<-- have this point to most up-to-date clinical data
 
   
 
