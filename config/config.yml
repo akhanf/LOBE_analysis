@@ -5,21 +5,21 @@ in_root: '$HOME/graham' #for cbs server
 groups:
   dre: 'dre_first_scan == 1'
   nondre: 'dre_first_scan == 0'
-  lobe: 'datatset == LOBE'
-  hcp: 'dataset == HCP'
-  female: 'sex == F'
-  male: 'sex == M'
-  seizure_onset_below_5: 'age_seizure_onset =< 5'
+  lobe: dataset == 'LOBE'
+  hcp: dataset == 'HCP'
+  female: sex == 'F'
+  male: sex == 'M'
+  seizure_onset_below_5: 'age_seizure_onset <= 5'
   seizure_onset_5_and_up: 'age_seizure_onset > 5'
-  ep_diagnosis_age_below_9: 'age_ep_diagnosis =< 8'
+  ep_diagnosis_age_below_9: 'age_ep_diagnosis <= 8'
   ep_diagnosis_age_above_8: 'age_ep_diagnosis >8'
   motor_seizures: 'motor_focal_seizures == 1'
-  nonmotor_seizures: 'non-motor_focal_seizures == 1'
+  nonmotor_seizures: 'non_motor_focal_seizures == 1'
   generalized: 'generalized_seizures == 1'
   nongeneralized: 'generalized_seizures == 0'
   FTBTC: 'FTBTC == 1'
   nonFTBTC: 'FTBTC == 0'
-  high_asm: 'asm_first_scan =>3'
+  high_asm: 'asm_first_scan >= 3'
   low_asm: 'asm_first_scan < 3'
   frontal: 'loc_final_frontal == 1'
   nonfrontal: 'loc_final_frontal == 0'
@@ -39,8 +39,6 @@ groups:
   nonbilateral: 'lat_final_bilateral == 0'
   multifocal: 'lat_final_multifocal == 1'
   nonmultifocal: 'lat_final_multifocal == 0'
-  
-  
 
 coltypes:
   - NSFC
@@ -56,40 +54,38 @@ ttests:
   - group1: temporal
     group2: nontemporal
   - group1: motor_seizures
-    group2: nonmotor_seizures	
+    group2: nonmotor_seizures
   - group1: generalized
     group2: nongeneralized
   - group1: FTBTC
-    group2: nonFTBTC       
+    group2: nonFTBTC
   - group1: left
-    group2: nonleft  
+    group2: nonleft
   - group1: right
     group2: nonright
-  - group1: male             
-    group2: female    
+  - group1: male
+    group2: female
   - group1: lobe
     group2: hcp
   - group1: seizure_onset_below_5
     group2: seizure_onset_5_and_up
   - group1: ep_diagnosis_age_below_9
     group2: ep_diagnosis_age_above_8
-  - group1: highasm
-    group2: lowasm
+  - group1: high_asm
+    group2: low_asm
   - group1: frontal
-    group2: nonfrontal      
+    group2: nonfrontal
   - group1: occipital
-    group2: nonoccipital  
+    group2: nonoccipital
   - group1: parietal
     group2: nonparietal
-  - group1: temporal_plus             
+  - group1: temporal_plus
     group2: nontemporal_plus
   - group1: bilateral
     group2: nonbilateral
   - group1: multifocal
     group2: nonmultifocal
 
-    
-    
 #lat_pet_left	lat_pet_right	lat_semiology_left	lat_semiology_right	lat_final_left	lat_final_right	lat_final_bilateral	lat_final_multifocal	loc_eeg_frontal	loc_eeg_occipital	loc_eeg_parietal	loc_eeg_temporal	loc_mri_frontal	loc_mri_occipital	loc_mri_parietal	loc_mri_temporal	loc_pet_frontal	loc_pet_occipital	loc_pet_parietal	loc_pet_temporal	loc_semiology	loc_final_frontal	loc_final_occipital	loc_final_parietal	loc_final_temporal	loc_final_temporal_plus	loc_final_extratemporal
 
 
@@ -145,7 +141,7 @@ datasets:
   - HCP
   - LOBE
 
-use_test_subjects: True
+use_test_subjects: False
 
 test_subjects: 
   HCP:
