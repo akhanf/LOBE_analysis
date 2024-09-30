@@ -8,11 +8,12 @@ def get_dwi_targets():
                     datatype="dwi",
                     den="32k",
                     atlas="{atlas}",
-                    suffix="struc.pconn.{plottype}.png",
+                    suffix="{struc}.pconn.{plottype}.png",
                     **config["subj_wildcards"],
                 ),
                 subject=subjects[dataset],
                 dataset=dataset,
+                struc=["struc","strucFA"],
                 plottype=["matrix", "chord"],
                 atlas=config["atlases"],
             )
@@ -24,11 +25,12 @@ def get_dwi_targets():
                     datatype="dwi",
                     den="32k",
                     atlas="{atlas}",
-                    suffix="netstruc.pconn.nii",
+                    suffix="net{struc}.pconn.nii",
                     **config["subj_wildcards"],
                 ),
                 subject=subjects[dataset],
                 dataset=dataset,
+                struc=["struc","strucFA"],
                 atlas=config["atlases"],
             )
         )

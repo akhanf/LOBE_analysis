@@ -221,7 +221,7 @@ rule struc_conn_csv_to_pconn_cifti:
             root=root,
             datatype="dwi",
             atlas="{atlas}",
-            suffix="struc.conn.csv",
+            suffix="{struc}.conn.csv",
             **config["subj_wildcards"],
         ),
     output:
@@ -230,7 +230,7 @@ rule struc_conn_csv_to_pconn_cifti:
             datatype="dwi",
             den="32k",
             atlas="{atlas}",
-            suffix="struc.pconn.nii",
+            suffix="{struc,struc|strucFA}.pconn.nii",
             **config["subj_wildcards"],
         ),
     group:
@@ -332,7 +332,7 @@ rule calc_network_sc:
             datatype="dwi",
             den="32k",
             atlas="{atlas}",
-            suffix="struc.pconn.nii",
+            suffix="{struc}.pconn.nii",
             **config["subj_wildcards"],
         ),
         label_tsv="resources/atlas/atlas-{atlas}_dseg.tsv",
@@ -342,7 +342,7 @@ rule calc_network_sc:
             datatype="dwi",
             den="32k",
             atlas="{atlas}",
-            suffix="netstruc.pconn.nii",
+            suffix="net{struc}.pconn.nii",
             **config["subj_wildcards"],
         ),
     group:

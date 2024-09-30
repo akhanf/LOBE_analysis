@@ -307,3 +307,38 @@ rule tck2connectome:
         config["singularity"]["mrtrix"]
     shell:
         "tck2connectome -nthreads {threads} -tck_weights_in {input.tckweights} -out_assignments {output.sl_assignment} -zero_diagonal -symmetric {input.tck} {input.parcellation} {output.conn}"
+
+
+rule tck2connectome_fa:
+    input:
+        tck=rules.tckgen.output.tck,
+        parcellation=bids(
+            root=root,
+            datatype="dwi",
+            atlas="{atlas}",
+            suffix="dseg.nii.gz",
+            **config["subj_wildcards"],
+        ),
+        fa=bids(
+            root=root,
+            datatype="dwi",
+            suffix="fa.mif",
+            **config["subj_wildcards"],
+        ),
+    output:
+        conn=bids(
+            root=root,
+            datatype="dwi",
+            atlas="{atlas}",
+            suffix="strucFA.conn.csv",
+            **config["subj_wildcards"],
+        ),
+    threads: 8
+    group:
+        "grouped_subject"
+    shadow: 'minimal'
+    container:
+        config["singularity"]["mrtrix"]
+    shell:
+        "tcksample -nthreads {threads} {input.tck} {input.fa} mean_FA_per_streamline.csv -stat_tck mean && "
+        "tck2connectome -nthreads {threads}  -zero_diagonal -symmetric {input.tck} {input.parcellation} {output.conn} -scale_file mean_FA_per_streamline.csv -stat_edge mean "

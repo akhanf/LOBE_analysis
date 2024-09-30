@@ -94,20 +94,20 @@ rule plot_struc_network:
             datatype="dwi",
             den="32k",
             atlas="{atlas}",
-            suffix="struc.pconn.nii",
+            suffix="{struc}.pconn.nii",
             **config["subj_wildcards"],
         ),
         label_tsv="resources/atlas/atlas-{atlas}_dseg.tsv",
     params:
         template="MNI152NLin6Asym",  #closest to fsLR surfs
-        opts=config["netplotbrain"]["struc"],
+        opts=lambda wildcards: config["netplotbrain"][wildcards.struc],
     output:
         png=bids(
             root=root,
             datatype="dwi",
             den="32k",
             atlas="{atlas}",
-            suffix="struc.pconn.network.png",
+            suffix="{struc}.pconn.network.png",
             **config["subj_wildcards"],
         ),
     group:
@@ -159,19 +159,19 @@ rule plot_struc_chord:
             datatype="dwi",
             den="32k",
             atlas="{atlas}",
-            suffix="struc.pconn.nii",
+            suffix="{struc}.pconn.nii",
             **config["subj_wildcards"],
         ),
         label_tsv="resources/atlas/atlas-{atlas}_dseg.tsv",
     params:
-        opts=config["nichord"]["struc"],
+        opts=lambda wildcards: config["nichord"][wildcards.struc],
     output:
         png=bids(
             root=root,
             datatype="dwi",
             den="32k",
             atlas="{atlas}",
-            suffix="struc.pconn.chord.png",
+            suffix="{struc}.pconn.chord.png",
             **config["subj_wildcards"],
         ),
     group:
