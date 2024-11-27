@@ -159,6 +159,7 @@ template_surf: 'resources/tpl-fsLR/tpl-fsLR_den-32k_hemi-{hemi}_{surf}.surf.gii'
 #atlases to actually use:
 atlases:
   - schaefer
+  - brainnetome
 
 
 atlas:
@@ -169,6 +170,7 @@ atlas:
     dlabel: resources/mmp/Q1-Q6_RelatedParcellation210.CorticalAreas_dil_Final_Final_Areas_Group_Colors.32k_fs_LR.dlabel.nii
   brainnetome: 
     dlabel: resources/brainnetome/fsaverage.BN_Atlas.32k_fs_LR_updated.dlabel.nii
+    network_pattern: '[^_]+_([^_]+)' #regex to find network name within label
 dwi:
   shells: 
     - '0'
