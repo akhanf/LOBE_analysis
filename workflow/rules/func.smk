@@ -13,14 +13,29 @@ rule map_bold_to_surface_fsLR:
         bold_preproc=lambda wildcards: config["input_path"]["bold_nii"][
             wildcards.dataset
         ],
-        mid_surf=lambda wildcards: config["input_path"]["surf_gii_t1"].format(
-            surf="midthickness", **wildcards
+        mid_surf=bids(
+            root=root,
+            datatype="anat",
+            hemi="{hemi}",
+            den="32k",
+            suffix="midthickness.surf.gii",
+            **config["subj_wildcards"],
         ),
-        white_surf=lambda wildcards: config["input_path"]["surf_gii_t1"].format(
-            surf="white", **wildcards
+        white_surf=bids(
+            root=root,
+            datatype="anat",
+            hemi="{hemi}",
+            den="32k",
+            suffix="white.surf.gii",
+            **config["subj_wildcards"],
         ),
-        pial_surf=lambda wildcards: config["input_path"]["surf_gii_t1"].format(
-            surf="pial", **wildcards
+        pial_surf=bids(
+            root=root,
+            datatype="anat",
+            hemi="{hemi}",
+            den="32k",
+            suffix="pial.surf.gii",
+            **config["subj_wildcards"],
         ),
     output:
         metric=bids(
@@ -113,11 +128,21 @@ rule denoise_cifti:
 rule smooth_cifti:
     input:
         cifti=rules.denoise_cifti.output.cifti,
-        left_surf=lambda wildcards: config["input_path"]["surf_gii_t1"].format(
-            surf="midthickness", hemi="L", **wildcards
+        left_surf=bids(
+            root=root,
+            datatype="anat",
+            hemi="L",
+            den="32k",
+            suffix="midthickness.surf.gii",
+            **config["subj_wildcards"],
         ),
-        right_surf=lambda wildcards: config["input_path"]["surf_gii_t1"].format(
-            surf="midthickness", hemi="R", **wildcards
+        right_surf=bids(
+            root=root,
+            datatype="anat",
+            hemi="R",
+            den="32k",
+            suffix="midthickness.surf.gii",
+            **config["subj_wildcards"],
         ),
     params:
         fwhm=lambda wildcards: float(wildcards.fwhm),

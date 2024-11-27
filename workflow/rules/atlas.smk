@@ -14,18 +14,55 @@ rule get_surf_label_from_cifti_atlas:
         "wb_command -cifti-separate {input.cifti} COLUMN -label CORTEX_LEFT {output.label_left} -label CORTEX_RIGHT {output.label_right}"
 
 
+rule resample_t1_surf_to_fsLR:
+    input:
+        surf=lambda wildcards: config["input_path"]["t1_surf"][wildcards.dataset].format(**wildcards),
+        sphere=lambda wildcards: config["input_path"]["msm_sphere"][wildcards.dataset].format(**wildcards),
+        new_sphere=lambda wildcards: config['template_surf'].format(surf='sphere',hemi=wildcards.hemi)
+    output:
+        surf=bids(
+            root=root,
+            datatype="anat",
+            hemi="{hemi}",
+            den="32k",
+            suffix="{surf}.surf.gii",
+            **config["subj_wildcards"],
+        ),
+    container:
+        config["singularity"]["diffparc"]
+    group:
+        "grouped_subject"
+    shell:
+        "wb_command -surface-resample {input.surf} {input.sphere} {input.new_sphere} BARYCENTRIC {output.surf}"
+
+
 rule map_atlas_to_dwi:
     input:
         vol_ref=config["input_path"]["dwi_mask"],
         label="resources/atlas/atlas-{atlas}_hemi-{hemi}_parc.label.gii",
-        mid_surf=lambda wildcards: config["input_path"]["surf_gii_t1"].format(
-            surf="midthickness", **wildcards
+        mid_surf=bids(
+            root=root,
+            datatype="anat",
+            hemi="{hemi}",
+            den="32k",
+            suffix="midthickness.surf.gii",
+            **config["subj_wildcards"],
         ),
-        white_surf=lambda wildcards: config["input_path"]["surf_gii_t1"].format(
-            surf="white", **wildcards
+        white_surf=bids(
+            root=root,
+            datatype="anat",
+            hemi="{hemi}",
+            den="32k",
+            suffix="white.surf.gii",
+            **config["subj_wildcards"],
         ),
-        pial_surf=lambda wildcards: config["input_path"]["surf_gii_t1"].format(
-            surf="pial", **wildcards
+        pial_surf=bids(
+            root=root,
+            datatype="anat",
+            hemi="{hemi}",
+            den="32k",
+            suffix="pial.surf.gii",
+            **config["subj_wildcards"],
         ),
     output:
         vol=bids(
