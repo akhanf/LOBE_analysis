@@ -56,8 +56,68 @@ rule map_bold_to_surface_fsLR:
         "wb_command -volume-to-surface-mapping {input.bold_preproc} {input.mid_surf}  {output.metric} -ribbon-constrained {input.white_surf} {input.pial_surf}"
 
 
+
+rule resample_subcort_to_mni_boldref:
+    input:
+        dseg=lambda wildcards: config["atlas"][wildcards.atlas]["subcort_dseg"],
+        ref=lambda wildcards: config["input_path"]["bold_mni_ref"][
+            wildcards.dataset
+        ],
+    output:
+        dseg=temp(bids(
+            root=root,
+            datatype="func",
+            atlas="{atlas}",
+            desc="subcortnolabel",
+            suffix="dseg.nii.gz",
+            **config["subj_wildcards"],
+        )),
+    container:
+        config["singularity"]["diffparc"]
+    group:
+        "grouped_subject"
+    shell:
+        "c3d -int 0 {input.ref} {input.dseg} -reslice-identity -o {output.dseg}"
+
+
+rule subcort_add_label_list:
+    input:
+        labellist=lambda wildcards: config["atlas"][wildcards.atlas]["subcort_labellist"],
+        dseg=bids(
+            root=root,
+            datatype="func",
+            atlas="{atlas}",
+            desc="subcortnolabel",
+            suffix="dseg.nii.gz",
+            **config["subj_wildcards"],
+        ),
+    output:
+         dseg=bids(
+            root=root,
+            datatype="func",
+            atlas="{atlas}",
+            desc="subcort",
+            suffix="dseg.nii.gz",
+            **config["subj_wildcards"],
+        ),
+
+    container:
+        config["singularity"]["diffparc"]
+    group:
+        "grouped_subject"
+    shell:
+        "wb_command -volume-label-import {input.dseg} {input.labellist} {output.dseg}"
+
+
+
+
+
+
 rule create_bold_cifti:
     input:
+        bold_preproc=lambda wildcards: config["input_path"]["bold_mni"][
+            wildcards.dataset
+        ],
         left_metric=bids(
             root=root,
             datatype="func",
@@ -78,12 +138,21 @@ rule create_bold_cifti:
             suffix="bold.dtseries.func.gii",
             **config["subj_wildcards"],
         ),
+        volume_label=bids(
+            root=root,
+            datatype="func",
+            atlas="{atlas}",
+            desc="subcort",
+            suffix="dseg.nii.gz",
+            **config["subj_wildcards"],
+        ),
     output:
         cifti=bids(
             root=root,
             datatype="func",
             desc="preproc",
             den="32k",
+            atlas="{atlas}",
             task="{task}",
             suffix="bold.dtseries.nii",
             **config["subj_wildcards"],
@@ -93,7 +162,7 @@ rule create_bold_cifti:
     group:
         "grouped_subject"
     shell:
-        "wb_command -cifti-create-dense-timeseries {output.cifti} -left-metric {input.left_metric} -right-metric {input.right_metric} "
+        "wb_command -cifti-create-dense-timeseries {output.cifti} -left-metric {input.left_metric} -right-metric {input.right_metric} -volume {input.bold_preproc} {input.volume_label}"
 
 
 rule denoise_cifti:
@@ -111,6 +180,7 @@ rule denoise_cifti:
             datatype="func",
             desc="preproc",
             den="32k",
+            atlas="{atlas}",
             task="{task}",
             denoise="{denoise}",
             suffix="bold.dtseries.nii",
@@ -153,6 +223,7 @@ rule smooth_cifti:
             desc="preproc",
             den="32k",
             task="{task}",
+            atlas="{atlas}",
             denoise="{denoise}",
             fwhm="{fwhm}",
             suffix="bold.dtseries.nii",
