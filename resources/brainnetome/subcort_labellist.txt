@@ -1,0 +1,72 @@
+L_mAmyg_Subcort
+211 128 128 128 255
+R_mAmyg_Subcort
+212 128 128 128 255
+L_lAmyg_Subcort
+213 128 128 128 255
+R_lAmyg_Subcort
+214 128 128 128 255
+L_rHipp_Subcort
+215 128 128 128 255
+R_rHipp_Subcort
+216 128 128 128 255
+L_cHipp_Subcort
+217 128 128 128 255
+R_cHipp_Subcort
+218 128 128 128 255
+L_vCa_Subcort
+219 128 128 128 255
+R_vCa_Subcort
+220 128 128 128 255
+L_GP_Subcort
+221 128 128 128 255
+R_GP_Subcort
+222 128 128 128 255
+L_NAC_Subcort
+223 128 128 128 255
+R_NAC_Subcort
+224 128 128 128 255
+L_vmPu_Subcort
+225 128 128 128 255
+R_vmPu_Subcort
+226 128 128 128 255
+L_dCa_Subcort
+227 128 128 128 255
+R_dCa_Subcort
+228 128 128 128 255
+L_dlPu_Subcort
+229 128 128 128 255
+R_dlPu_Subcort
+230 128 128 128 255
+L_mPFtha_Subcort
+231 128 128 128 255
+R_mPFtha_Subcort
+232 128 128 128 255
+L_mPMtha_Subcort
+233 128 128 128 255
+R_mPMtha_Subcort
+234 128 128 128 255
+L_Stha_Subcort
+235 128 128 128 255
+R_Stha_Subcort
+236 128 128 128 255
+L_rTtha_Subcort
+237 128 128 128 255
+R_rTtha_Subcort
+238 128 128 128 255
+L_PPtha_Subcort
+239 128 128 128 255
+R_PPtha_Subcort
+240 128 128 128 255
+L_Otha_Subcort
+241 128 128 128 255
+R_Otha_Subcort
+242 128 128 128 255
+L_cTtha_Subcort
+243 128 128 128 255
+R_cTtha_Subcort
+244 128 128 128 255
+L_lPFtha_Subcort
+245 128 128 128 255
+R_lPFtha_Subcort
+246 128 128 128 255
