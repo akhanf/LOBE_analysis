@@ -56,68 +56,105 @@ rule map_bold_to_surface_fsLR:
         "wb_command -volume-to-surface-mapping {input.bold_preproc} {input.mid_surf}  {output.metric} -ribbon-constrained {input.white_surf} {input.pial_surf}"
 
 
-
-rule resample_subcort_to_mni_boldref:
+#--- this was added new:
+rule resample_structure_volume_to_mni_boldref:
+    """ this is the HCP grayordinates segmentation, with segmentation labels for
+        the standard 19 structures. It is used for sampling the BOLD data, then
+        the actual parcellation is applied later (with a cifti dlabel in the same
+        grayordinates space)."""
     input:
-        dseg=lambda wildcards: config["atlas"][wildcards.atlas]["subcort_dseg"],
+        dseg=lambda wildcards: config["cifti"]["structure_label_volume"],
         ref=lambda wildcards: config["input_path"]["bold_mni_ref"][
             wildcards.dataset
         ],
     output:
-        dseg=temp(bids(
+        dseg=bids(
             root=root,
             datatype="func",
-            atlas="{atlas}",
-            desc="subcortnolabel",
+            desc="structurelabelvolume",
+            space="boldref",
             suffix="dseg.nii.gz",
             **config["subj_wildcards"],
-        )),
+        ),
     container:
         config["singularity"]["diffparc"]
     group:
         "grouped_subject"
     shell:
-        "c3d -int 0 {input.ref} {input.dseg} -reslice-identity -o {output.dseg}"
+        "wb_command -volume-resample  {input.dseg}  {input.ref} ENCLOSING_VOXEL {output.dseg}"
 
-
-rule subcort_add_label_list:
+rule resample_parc_volume_to_mni_boldref:
     input:
-        labellist=lambda wildcards: config["atlas"][wildcards.atlas]["subcort_labellist"],
+        dseg=lambda wildcards: config["atlas"][wildcards.atlas]["label_volume"],
+        ref=lambda wildcards: config["input_path"]["bold_mni_ref"][
+            wildcards.dataset
+        ],
+    output:
         dseg=bids(
             root=root,
             datatype="func",
             atlas="{atlas}",
-            desc="subcortnolabel",
+            desc="labelvolume",
+            space="boldref",
             suffix="dseg.nii.gz",
             **config["subj_wildcards"],
         ),
-    output:
-         dseg=bids(
-            root=root,
-            datatype="func",
-            atlas="{atlas}",
-            desc="subcort",
-            suffix="dseg.nii.gz",
-            **config["subj_wildcards"],
-        ),
-
     container:
         config["singularity"]["diffparc"]
     group:
         "grouped_subject"
     shell:
-        "wb_command -volume-label-import {input.dseg} {input.labellist} {output.dseg}"
+        "wb_command -volume-resample  {input.dseg}  {input.ref} ENCLOSING_VOXEL {output.dseg}"
+
+
+rule create_cifti_label_boldref:
+    input:
+        structure_label_volume=rules.resample_structure_volume_to_mni_boldref.output.dseg,
+        label_volume=rules.resample_parc_volume_to_mni_boldref.output.dseg,
+        label_left="resources/atlas/atlas-{atlas}_hemi-L_parc.label.gii",
+        label_right="resources/atlas/atlas-{atlas}_hemi-R_parc.label.gii",
+    output:
+        cifti=bids(
+            root=root,
+            datatype="func",
+            atlas="{atlas}",
+            den="91k",
+            space="boldref",
+            suffix="parc.dlabel.nii",
+            **config["subj_wildcards"],
+        ),
+    container:
+        config["singularity"]["diffparc"]
+    group:
+        "grouped_subject"
+    shell:
+        "wb_command -cifti-create-label {output} -volume {input.label_volume} {input.structure_label_volume} "
+        " -left-label {input.label_left} -right-label {input.label_right} "
+
+
+#----
+
+# ok what we need to actually do:
+
+# inputs:
+#   we have brainnettome cort_subcort_label_list, and subcort segmentation in mni6asym  (label_volume)
+#   we have hcp subcort_label_list, and subcort segmentation in hcp6asym space  (structure_label_volume)
+#   from fmriprep we have preproc_bold in mni6Asym space, but it is cropped relative to the standard res-02 template space
+
+# so, first we need to resample the label_volume and structure_label_volume into the subject boldref space
+#  -volume-resample with ENCLOSING_VOXEL (nearest neighbor) - spaces differ only by num of voxels, so no interpolation actually needed
 
 
 
+# then, when making the bold dtseries, we use them:
+#wb_command -cifti-create-dense-timeseries results/LOBE/sub-029/func/sub-029_task-rest_den-32kwithvol_desc-preproc_bold.dtseries.nii -left-metric results/LOBE/sub-029/func/sub-029_task-rest_hemi-L_den-32k_desc-preproc_bold.dtseries.func.gii -right-metric results/LOBE/sub-029/func/sub-029_task-rest_hemi-R_den-32k_desc-preproc_bold.dtseries.func.gii -volume  snakebatch/LOBE/derivatives/fmriprep/sub-029/func/sub-029_task-rest_acq-AP_run-1_space-MNI152NLin6Asym_desc-preproc_bold.nii.gz hcp_dseg_resampled_to_subj_bold_mni6_dlabel.nii.gz 
 
+
+# then, when we want to parcellate, we need to make sure the dlabel we have has the same volume space as the dtseries (ie boldref).. this can be done by  creating a dlabel in the boldref space, using cifti-create-label
 
 
 rule create_bold_cifti:
     input:
-        bold_preproc=lambda wildcards: config["input_path"]["bold_mni"][
-            wildcards.dataset
-        ],
         left_metric=bids(
             root=root,
             datatype="func",
@@ -138,11 +175,14 @@ rule create_bold_cifti:
             suffix="bold.dtseries.func.gii",
             **config["subj_wildcards"],
         ),
-        volume_label=bids(
+        bold_preproc=lambda wildcards: config["input_path"]["bold_mni"][
+            wildcards.dataset
+        ],
+        dseg=bids(
             root=root,
             datatype="func",
-            atlas="{atlas}",
-            desc="subcort",
+            desc="structurelabelvolume",
+            space="boldref",
             suffix="dseg.nii.gz",
             **config["subj_wildcards"],
         ),
@@ -151,8 +191,8 @@ rule create_bold_cifti:
             root=root,
             datatype="func",
             desc="preproc",
-            den="32k",
-            atlas="{atlas}",
+            den="91k",
+            space="boldref",
             task="{task}",
             suffix="bold.dtseries.nii",
             **config["subj_wildcards"],
@@ -162,12 +202,22 @@ rule create_bold_cifti:
     group:
         "grouped_subject"
     shell:
-        "wb_command -cifti-create-dense-timeseries {output.cifti} -left-metric {input.left_metric} -right-metric {input.right_metric} -volume {input.bold_preproc} {input.volume_label}"
+        "wb_command -cifti-create-dense-timeseries {output.cifti} -left-metric {input.left_metric} -right-metric {input.right_metric} "
+        " -volume {input.bold_preproc} {input.dseg}"
 
 
 rule denoise_cifti:
     input:
-        cifti=rules.create_bold_cifti.output.cifti,
+        cifti=bids(
+            root=root,
+            datatype="func",
+            desc="preproc",
+            den="91k",
+            space="boldref",
+            task="{task}",
+            suffix="bold.dtseries.nii",
+            **config["subj_wildcards"],
+        ),
         json=lambda wildcards: config["input_path"]["bold_json"][wildcards.dataset],
         confounds_tsv=lambda wildcards: config["input_path"]["bold_confounds"][
             wildcards.dataset
@@ -179,8 +229,8 @@ rule denoise_cifti:
             root=root,
             datatype="func",
             desc="preproc",
-            den="32k",
-            atlas="{atlas}",
+            den="91k",
+            space="boldref",
             task="{task}",
             denoise="{denoise}",
             suffix="bold.dtseries.nii",
@@ -221,9 +271,9 @@ rule smooth_cifti:
             root=root,
             datatype="func",
             desc="preproc",
-            den="32k",
+            den="91k",
+            space="boldref",
             task="{task}",
-            atlas="{atlas}",
             denoise="{denoise}",
             fwhm="{fwhm}",
             suffix="bold.dtseries.nii",
@@ -241,7 +291,16 @@ rule smooth_cifti:
 rule parcellate_bold:
     input:
         cifti_dtseries=rules.smooth_cifti.output.cifti,
-        cifti_dlabel=lambda wildcards: config["atlas"][wildcards.atlas]["dlabel"],
+        cifti_dlabel=bids(
+            root=root,
+            datatype="func",
+            atlas="{atlas}",
+            den="91k",
+            space="boldref",
+            suffix="parc.dlabel.nii",
+            **config["subj_wildcards"],
+        ),
+
     params:
         exclude_opt=(
             "-exclude-outliers {nstdev} {nstdev}".format(
@@ -255,7 +314,7 @@ rule parcellate_bold:
             root=root,
             datatype="func",
             desc="preproc",
-            den="32k",
+            den="91k",
             task="{task}",
             denoise="{denoise}",
             fwhm="{fwhm}",
@@ -282,7 +341,7 @@ rule correlate_parcels:
             root=root,
             datatype="func",
             desc="preproc",
-            den="32k",
+            den="91k",
             task="{task}",
             denoise="{denoise}",
             fwhm="{fwhm}",
@@ -297,7 +356,6 @@ rule correlate_parcels:
     shell:
         "wb_command -cifti-correlation {input.cifti} {output.cifti} {params.fisher_z} "
 
-
 rule struc_conn_csv_to_pconn_cifti:
     input:
         #for reference pconn, pick the first task, denoise, fwhm values from config (any would do)
@@ -305,7 +363,7 @@ rule struc_conn_csv_to_pconn_cifti:
             root=root,
             datatype="func",
             desc="preproc",
-            den="32k",
+            den="91k",
             task=config["func"]["task"][0],
             denoise=next(iter(config["func"]["denoise"])),
             fwhm=config["func"]["fwhm"][0],
@@ -324,7 +382,7 @@ rule struc_conn_csv_to_pconn_cifti:
         cifti_pconn=bids(
             root=root,
             datatype="dwi",
-            den="32k",
+            den="91k",
             atlas="{atlas}",
             suffix="{struc,struc|strucFA}.pconn.nii",
             **config["subj_wildcards"],
@@ -353,7 +411,7 @@ rule calc_sfc:
         pconn_struc=bids(
             root=root,
             datatype="dwi",
-            den="32k",
+            den="91k",
             atlas="{atlas}",
             suffix="struc.pconn.nii",
             **config["subj_wildcards"],
@@ -362,7 +420,7 @@ rule calc_sfc:
             root=root,
             datatype="func",
             desc="preproc",
-            den="32k",
+            den="91k",
             task="{task}",
             denoise="{denoise}",
             fwhm="{fwhm}",
@@ -375,7 +433,7 @@ rule calc_sfc:
             root=root,
             datatype="func",
             desc="preproc",
-            den="32k",
+            den="91k",
             task="{task}",
             denoise="{denoise}",
             fwhm="{fwhm}",
@@ -394,7 +452,7 @@ rule calc_network_fc:
             root=root,
             datatype="func",
             desc="preproc",
-            den="32k",
+            den="91k",
             task="{task}",
             denoise="{denoise}",
             fwhm="{fwhm}",
@@ -408,7 +466,7 @@ rule calc_network_fc:
             root=root,
             datatype="func",
             desc="preproc",
-            den="32k",
+            den="91k",
             task="{task}",
             denoise="{denoise}",
             fwhm="{fwhm}",
@@ -426,7 +484,7 @@ rule calc_network_sc:
         pconn=bids(
             root=root,
             datatype="dwi",
-            den="32k",
+            den="91k",
             atlas="{atlas}",
             suffix="{struc}.pconn.nii",
             **config["subj_wildcards"],
@@ -436,7 +494,7 @@ rule calc_network_sc:
         pconn=bids(
             root=root,
             datatype="dwi",
-            den="32k",
+            den="91k",
             atlas="{atlas}",
             suffix="net{struc}.pconn.nii",
             **config["subj_wildcards"],
@@ -452,7 +510,7 @@ rule calc_network_sfc:
         pconn_sc=bids(
             root=root,
             datatype="dwi",
-            den="32k",
+            den="91k",
             atlas="{atlas}",
             suffix="struc.pconn.nii",
             **config["subj_wildcards"],
@@ -461,7 +519,7 @@ rule calc_network_sfc:
             root=root,
             datatype="func",
             desc="preproc",
-            den="32k",
+            den="91k",
             task="{task}",
             denoise="{denoise}",
             fwhm="{fwhm}",
@@ -475,7 +533,7 @@ rule calc_network_sfc:
             root=root,
             datatype="func",
             desc="preproc",
-            den="32k",
+            den="91k",
             task="{task}",
             denoise="{denoise}",
             fwhm="{fwhm}",

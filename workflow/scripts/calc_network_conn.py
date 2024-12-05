@@ -1,37 +1,7 @@
 import pandas as pd
 import nibabel as nib
 import numpy as np
-
-def get_network_vertices(parcel_axis, networks):
-    """ this gets the vertex indices for the agglomerated
-        network regions, from the regional parcel_axis, and mapping from
-        region to network"""
-    structures = parcel_axis.nvertices.keys()
-
-    network_names = networks.unique()
-
-    verts_list = []
-    for i,net in enumerate(network_names):
-
-        region_indices = np.where(networks == net)[0]
-        
-        verts={}
-        for structure in structures:
-            
-            temp_verts = []
-            
-            for region in region_indices:
-                if structure in parcel_axis.vertices[region]:
-                    temp_verts.append(parcel_axis.vertices[region][structure])
-                    
-            verts[structure] = np.concatenate(temp_verts)
-
-        verts_list.append(verts)
-            
-
-    return np.array(verts_list)
-
-
+from lib.utils import get_network_vertices_voxels
 
 nib_conn = nib.load(snakemake.input.pconn)
 
@@ -76,7 +46,7 @@ for i,net_i in enumerate(network_names):
 parcel_axis = nib_conn.header.get_axis(0)
 network_axis = parcel_axis
 network_axis.name = network_names
-network_axis.vertices = get_network_vertices(parcel_axis,df_atlas.networks)
+(network_axis.vertices,network_axis.voxels) = get_network_vertices_voxels(parcel_axis,df_atlas.networks)
 
 nib_network = nib.Cifti2Image(conn_network,header=(network_axis,network_axis))
 nib_network.to_filename(snakemake.output.pconn)
