@@ -1,9 +1,11 @@
 import numpy as np
 
 def get_network_vertices_voxels(parcel_axis, networks):
-    """ this gets the vertex indices for the agglomerated
+    """ this gets the vertex and voxel indices for the agglomerated
         network regions, from the regional parcel_axis, and mapping from
-        region to network"""
+        region to network.  This is so we can create a new parcellated
+        connectivity (pconn) but with networks instead.
+        """
     structures = parcel_axis.nvertices.keys()
 
     network_names = networks.unique()
