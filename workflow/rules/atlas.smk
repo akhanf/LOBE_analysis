@@ -81,6 +81,32 @@ rule map_atlas_to_dwi:
         "wb_command -label-to-volume-mapping {input.label} {input.mid_surf} {input.vol_ref} {output.vol} -ribbon-constrained {input.white_surf} {input.pial_surf}"
 
 
+rule resample_subcort_dseg_to_dwi:
+    input:
+        dseg=lambda wildcards: config["atlas"][wildcards.atlas]["label_volume"],
+        vol_ref=config["input_path"]["dwi_mask"],
+        warp=lambda wildcards: config["input_path"]["warp_mni_t1w"][
+            wildcards.dataset
+        ],
+    output:
+        dseg=bids(
+            root=root,
+            datatype="dwi",
+            atlas="{atlas}",
+            desc="subcort",
+            space="dwi",
+            suffix="dseg.nii.gz",
+            **config["subj_wildcards"],
+        ),
+    container:
+        config["singularity"]["diffparc"]
+    group:
+        "grouped_subject"
+    shell:
+        "antsApplyTransforms -i {input.dseg} -r {input.vol_ref} -t {input.warp} -o {output.dseg} -n NearestNeighbor -v"
+
+
+
 rule merge_lr_dseg:
     input:
         left=bids(
@@ -99,6 +125,15 @@ rule merge_lr_dseg:
             suffix="dseg.nii.gz",
             **config["subj_wildcards"],
         ),
+        dseg=bids(
+            root=root,
+            datatype="dwi",
+            atlas="{atlas}",
+            desc="subcort",
+            space="dwi",
+            suffix="dseg.nii.gz",
+            **config["subj_wildcards"],
+        ),
     output:
         merged=bids(
             root=root,
@@ -112,7 +147,7 @@ rule merge_lr_dseg:
     group:
         "grouped_subject"
     shell:
-        "c3d {input.left} {input.right} -max -o {output.merged}"
+        "c3d {input} -accum -max -endaccum -o {output.merged}"
 
 
 rule get_label_txt_from_cifti:
