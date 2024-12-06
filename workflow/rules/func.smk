@@ -131,28 +131,6 @@ rule create_cifti_label_boldref:
         "wb_command -cifti-create-label {output} -volume {input.label_volume} {input.structure_label_volume} "
         " -left-label {input.label_left} -right-label {input.label_right} "
 
-
-#----
-
-# ok what we need to actually do:
-
-# inputs:
-#   we have brainnettome cort_subcort_label_list, and subcort segmentation in mni6asym  (label_volume)
-#   we have hcp subcort_label_list, and subcort segmentation in hcp6asym space  (structure_label_volume)
-#   from fmriprep we have preproc_bold in mni6Asym space, but it is cropped relative to the standard res-02 template space
-
-# so, first we need to resample the label_volume and structure_label_volume into the subject boldref space
-#  -volume-resample with ENCLOSING_VOXEL (nearest neighbor) - spaces differ only by num of voxels, so no interpolation actually needed
-
-
-
-# then, when making the bold dtseries, we use them:
-#wb_command -cifti-create-dense-timeseries results/LOBE/sub-029/func/sub-029_task-rest_den-32kwithvol_desc-preproc_bold.dtseries.nii -left-metric results/LOBE/sub-029/func/sub-029_task-rest_hemi-L_den-32k_desc-preproc_bold.dtseries.func.gii -right-metric results/LOBE/sub-029/func/sub-029_task-rest_hemi-R_den-32k_desc-preproc_bold.dtseries.func.gii -volume  snakebatch/LOBE/derivatives/fmriprep/sub-029/func/sub-029_task-rest_acq-AP_run-1_space-MNI152NLin6Asym_desc-preproc_bold.nii.gz hcp_dseg_resampled_to_subj_bold_mni6_dlabel.nii.gz 
-
-
-# then, when we want to parcellate, we need to make sure the dlabel we have has the same volume space as the dtseries (ie boldref).. this can be done by  creating a dlabel in the boldref space, using cifti-create-label
-
-
 rule create_bold_cifti:
     input:
         left_metric=bids(
