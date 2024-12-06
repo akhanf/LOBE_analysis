@@ -44,9 +44,9 @@ coltypes:
   - NSFC
   - NFC
   - NSC
-#  - RSFC
-#  - RFC
-#  - RSC
+  - RSFC
+  - RFC
+  - RSC
 
 ttests:
   - group1: dre
@@ -256,7 +256,7 @@ netplotbrain:
     edge_threshold: 100
     edge_widthscale: 0.001
 
-  struc:
+  strucFA:
     view: 'LSc'
     edge_thresholddirection: above
     edge_threshold: 0.3
