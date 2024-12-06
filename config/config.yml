@@ -162,7 +162,7 @@ datasets:
   - HCP
   - LOBE
 
-use_test_subjects: True
+use_test_subjects: False
 
 test_subjects: 
   HCP: 
