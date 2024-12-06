@@ -46,4 +46,3 @@ for column_name in columns:
 
     out_png = f'{snakemake.output.plotsdir}/{column_name}.png'
     plt.savefig(out_png)
-
