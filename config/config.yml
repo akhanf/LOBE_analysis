@@ -1,5 +1,5 @@
 
-in_root: '$HOME/graham' #for cbs server
+in_root: '$HOME/beluga' #for cbs server
 #in_root: '$HOME' #for graham
 
 groups:
@@ -93,15 +93,15 @@ ttests:
 #files in one big zip file - these paths are relative to in_root defined above
 in_agg_zip: 
   snakebatch_dwi:
-    HCP: 'projects/ctb-akhanf/cfmm-bids/Khan/LOBE/derivatives/snakebatch_LOBE_HCP_2023_09_23.zip'
-    LOBE: 'projects/ctb-akhanf-ab/cfmm-bids/Khan/LOBE/derivatives/snakebatch_LOBE_2024_03_19.zip'
+    HCP: 'scratch/LOBE/derivatives/snakebatch_LOBE_HCP_2023_09_23.zip'
+    LOBE: 'scratch/derivatives/snakebatch_LOBE_2024_03_19.zip'
   snakebatch:
-    HCP: 'projects/ctb-akhanf-ab/cfmm-bids/Khan/LOBE/derivatives/snakebatch_HCP_snakeanat_fmriprep_2024_03_21.zip'
-    LOBE: 'projects/ctb-akhanf-ab/cfmm-bids/Khan/LOBE/derivatives/snakebatch_LOBE_2024_03_19.zip'
+    HCP: 'scratch/derivatives/snakebatch_HCP_snakeanat_fmriprep_2024_03_21.zip'
+    LOBE: 'scratch/derivatives/snakebatch_LOBE_2024_03_19.zip'
 
 in_tabular:
   HCP: 'projects/ctb-akhanf/ext-data/hcp_development/HCPDevImagingManifestBeh/ndar_subject01.txt'
-  LOBE: 'projects/ctb-akhanf-ab/cfmm-bids/Khan/LOBE/raw/baseline/clinical/participants.tsv' #<-- have this point to most up-to-date clinical data
+  LOBE: 'scratch/raw/baseline/clinical/participants.tsv' #<-- have this point to most up-to-date clinical data
 
   
 
