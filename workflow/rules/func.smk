@@ -363,7 +363,7 @@ rule struc_conn_csv_to_pconn_cifti:
             datatype="dwi",
             den="91k",
             atlas="{atlas}",
-            suffix="{struc,struc}.pconn.nii",
+            suffix="{struc,struc|strucFA}.pconn.nii",
             **config["subj_wildcards"],
         ),
     group:
