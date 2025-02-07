@@ -14,6 +14,22 @@ rule get_surf_label_from_cifti_atlas:
         "wb_command -cifti-separate {input.cifti} COLUMN -label CORTEX_LEFT {output.label_left} -label CORTEX_RIGHT {output.label_right}"
 
 
+rule resample_labels_from_fsaverage_to_fsLR:
+    input:
+        label="resources/atlas/atlas-{atlas}_hemi-{hemi}_parc.label.gii",
+        sphere=lambda wildcards: config['template_fsavg_surf'].format(surf='sphere',hemi=wildcards.hemi),
+        new_sphere=lambda wildcards: config['template_surf'].format(surf='sphere',hemi=wildcards.hemi)
+    output:
+        label="resources/atlas/atlas-{atlas}_space-fsLR_hemi-{hemi}_parc.label.gii",
+    container:
+        config["singularity"]["diffparc"]
+    group:
+        "grouped_subject"
+    shell:
+        #"wb_command -label-resample {input.label} {input.sphere} {input.new_sphere} BARYCENTRIC {output.label}"
+        "cp {input.label} {output.label}"#wb_command -label-resample {input.label} {input.sphere} {input.new_sphere} BARYCENTRIC {output.label}"
+
+
 rule resample_t1_surf_to_fsLR:
     input:
         surf=lambda wildcards: config["input_path"]["t1_surf"][wildcards.dataset].format(**wildcards),
@@ -36,10 +52,11 @@ rule resample_t1_surf_to_fsLR:
         "wb_command -surface-resample {input.surf} {input.sphere} {input.new_sphere} BARYCENTRIC {output.surf}"
 
 
+
 rule map_atlas_to_dwi:
     input:
         vol_ref=config["input_path"]["dwi_mask"],
-        label="resources/atlas/atlas-{atlas}_hemi-{hemi}_parc.label.gii",
+        label="resources/atlas/atlas-{atlas}_space-fsLR_hemi-{hemi}_parc.label.gii",
         mid_surf=bids(
             root=root,
             datatype="anat",
