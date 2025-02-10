@@ -179,6 +179,9 @@ test_subjects:
 #   - '040'
     - '041'
 
+bug_fmriprep_v23:
+  - '041'
+
 template_surf: 'resources/tpl-fsLR/tpl-fsLR_den-32k_hemi-{hemi}_{surf}.surf.gii'
 template_fsavg_surf: 'resources/tpl-fsLR/tpl-fsLR_space-fsaverage_hemi-{hemi}_den-32k_{surf}.surf.gii'
 
